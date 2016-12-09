@@ -16,9 +16,22 @@ RUN apt-get update -qq && \
 RUN rm -rf /data/var/db/pkgin && \
     /data/bin/pkgin -y up && \
     /data/bin/pkgin -y in \
+        rsync \
         easyrsa \
         openvpn && \
     rm -rf /data/var/db/pkgin/cache
+
+RUN mkdir -p /data/share/nanobox && \
+    cp -r /data/share/examples/easyrsa/* /data/share/nanobox && \
+    cd /data/share/nanobox && \
+    /data/bin/easyrsa init-pki && \
+    /data/bin/easyrsa --req-cn="Nanobox" --batch build-ca nopass && \
+    /data/bin/easyrsa gen-dh && \
+    /data/bin/easyrsa build-server-full server nopass && \
+    /data/bin/easyrsa build-client-full client1 nopass
+
+# Own all gonano files
+RUN chown -R gonano:gonano /data
 
 # Install hooks
 RUN curl \
