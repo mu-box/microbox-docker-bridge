@@ -1,0 +1,27 @@
+sudo: required
+
+dist: trusty
+
+services:
+  - docker
+
+before_install:
+  - sudo apt-get -y purge docker-engine
+  - bash <(curl -fsSL https://get.docker.com/)
+  - docker version
+  - docker build -t nanobox/bridge .
+
+script: sudo test/run_all.sh
+
+after_success:
+  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+  - docker build -t ${NAMESPACE}/bridge .
+  - docker tag ${NAMESPACE}/bridge ${NAMESPACE}/bridge:beta;
+  - docker push ${REMOTE}${NAMESPACE}/bridge:beta;
+  - if [ "$BRANCH" == "master" ]; then
+    docker push ${REMOTE}${NAMESPACE}/bridge;
+    else
+    docker tag ${NAMESPACE}/bridge ${NAMESPACE}/bridge:${BRANCH//\//_};
+    docker push ${REMOTE}${NAMESPACE}/bridge:${BRANCH//\//_};
+    fi
