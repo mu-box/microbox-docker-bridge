@@ -23,6 +23,7 @@ after_success:
   - docker tag ${NAMESPACE}/bridge:squashed ${NAMESPACE}/bridge:beta;
   - docker push ${REMOTE}${NAMESPACE}/bridge:beta;
   - if [ "$BRANCH" == "master" ]; then
+    docker tag ${NAMESPACE}/bridge:squashed ${NAMESPACE}/bridge;
     docker push ${REMOTE}${NAMESPACE}/bridge;
     else
     docker tag ${NAMESPACE}/bridge:squashed ${NAMESPACE}/bridge:${BRANCH//\//_};
