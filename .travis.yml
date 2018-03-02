@@ -1,13 +1,9 @@
 sudo: required
 
-dist: trusty
-
 services:
   - docker
 
 before_install:
-  - sudo apt-get -y purge docker-engine
-  - bash <(curl -fsSL https://get.docker.com/)
   - docker version
   - sudo apt-get -y install python-pip
   - sudo pip install docker==2.7.0 docker-squash
